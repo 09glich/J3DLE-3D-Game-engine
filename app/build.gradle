@@ -15,6 +15,10 @@ repositories {
     mavenCentral()
 }
 
+ext {
+    imguiVersion = "1.86.11" // current stable imgui-java line
+}
+
 dependencies {
     // Use JUnit Jupiter for testing.
     testImplementation libs.junit.jupiter
@@ -39,6 +43,12 @@ dependencies {
     //JOML Java opengl math library
     implementation 'org.joml:joml:1.10.8'
 
+    //ImGUI
+    implementation "io.github.spair:imgui-java-binding:$imguiVersion"
+    implementation "io.github.spair:imgui-java-lwjgl3:$imguiVersion"
+    implementation "io.github.spair:imgui-java-natives-windows:$imguiVersion"
+
+    implementation 'com.google.code.gson:gson:2.10.1'
     
 }
 

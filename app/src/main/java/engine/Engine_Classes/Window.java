@@ -14,9 +14,6 @@ public class Window {
     private long window;
     private int width;
     private int height;
-
-
-    
     
     private void WindowCheck() throws Exception {
         if (window == 0) throw new Exception("Window not initialized. cannot start window");
@@ -72,5 +69,7 @@ public class Window {
         return new Vector2(width, height);
     }
 
-
+    public long getWindowHandel() {
+        return window;
+    }
 }

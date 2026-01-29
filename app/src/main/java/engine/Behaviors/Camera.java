@@ -19,6 +19,11 @@ public class Camera extends Component{
     public float NearClippingPlane = 0.01f;
     public float FarClippingPlane = 1000f;
 
+    public Camera() {
+        setVeiwSize(new Vector2(1280, 720)) ;
+        CameraMode = CameraMode.PERSPECTIVE;
+    }
+
     public Matrix4f getProjectionMatrix4f() 
     {
         AspectRatio = ViewSize.x / ViewSize.y;

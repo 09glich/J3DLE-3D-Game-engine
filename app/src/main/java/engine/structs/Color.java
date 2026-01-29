@@ -38,5 +38,35 @@ public class Color {
     public static Color black = new Color(0,0,0);
     public static Color white = new Color(255,255,255);
 
+    // HSV helpers (h in degrees [0..360), s/v in [0..1])
+    public static Color FromHSV(float h, float s, float v) {
+        return FromHSV(h, s, v, 1.0f);
+    }
+
+    public static Color FromHSV(float h, float s, float v, float a) {
+        float c = v * s;
+        float hh = ((h % 360f) + 360f) % 360f;
+        float hPrime = hh / 60f;
+        float x = c * (1f - Math.abs(hPrime % 2f - 1f));
+
+        float r1 = 0f, g1 = 0f, b1 = 0f;
+        if (hPrime < 1f) {
+            r1 = c; g1 = x; b1 = 0f;
+        } else if (hPrime < 2f) {
+            r1 = x; g1 = c; b1 = 0f;
+        } else if (hPrime < 3f) {
+            r1 = 0f; g1 = c; b1 = x;
+        } else if (hPrime < 4f) {
+            r1 = 0f; g1 = x; b1 = c;
+        } else if (hPrime < 5f) {
+            r1 = x; g1 = 0f; b1 = c;
+        } else {
+            r1 = c; g1 = 0f; b1 = x;
+        }
+
+        float m = v - c;
+        return new Color(r1 + m, g1 + m, b1 + m, a);
+    }
+
     private static int clamp8(int v) { return Math.max(0, Math.min(255, v)); }
 }

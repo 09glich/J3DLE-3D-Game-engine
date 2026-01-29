@@ -6,6 +6,33 @@ public class Component {
     
     private GameObject gameObject;
     private Transform transform;
+    private boolean started = false;
+    private boolean enabled = true;
+
+    // Lifecycle (override in subclasses)
+    public void start() {}
+    public void update() {}
+
+    public final void engineStart() {
+        if (!started) {
+            started = true;
+            start();
+        }
+    }
+
+    public final void engineUpdate() {
+        if (enabled) {
+            update();
+        }
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
 
     //Getters
     public Transform transform() {

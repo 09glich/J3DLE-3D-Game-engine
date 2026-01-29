@@ -49,18 +49,14 @@ public class Mesh {
     }
 
     public Mesh() {
-        //MeshIndex = Engine_Graphics.PushMesh(this);
+        Verticies = new Vertex[0];
+        Triangles = new Face[0];
     }
 
     public void BUILD() {
         MeshIndex = Engine_Graphics.PushMesh(this);
     }
-
-    //public Vector3[] Verticies;
-    //public Vector3[] VertexNormals;
-    //public Color[] VertexColors;
-    //public Vector2[] VertexUV;
-
+    
     public Vector3[] getpositionList() 
     {
         Vector3[] positions = new Vector3[this.Verticies.length];

@@ -2,6 +2,7 @@ package engine;
 
 import engine.Engine_Classes.Time;
 import engine.Engine_Classes.Window;
+import engine.Hiarachy.SceneManager;
 
 import java.util.concurrent.locks.LockSupport;
 
@@ -13,13 +14,15 @@ import engine.debugging.Debug;
 
 public class App {
 
-    static int Framerate = 144;
+    static private int Framerate = 144;
+    static private long TimeBetweenFrameCall;
+    static private Window CurrentWindow;
 
     public static void main(String[] args) throws Exception {
 
-        long TimeBetweenFrameCall = 1_000_000_000l/Framerate;
+        TimeBetweenFrameCall = 1_000_000_000l/Framerate;
 
-        Window CurrentWindow = new Window();
+        CurrentWindow = new Window();
 
         CurrentWindow.Start(); 
 
@@ -41,9 +44,10 @@ public class App {
 
             Engine_Graphics.beginFrame();// Begining the  Frame
             
-            app.Update();
+            SceneManager.update();
 
-            Engine_Graphics.renderCamera(app.currentCamera);
+            SceneManager.getActiveScene().getScenePrimaryCamera().setVeiwSize(CurrentWindow.getSize());
+            Engine_Graphics.renderCamera(SceneManager.getActiveScene().getScenePrimaryCamera());
             
             CurrentWindow.WindowUpdate();
             Engine_Graphics.endFrame();
@@ -76,4 +80,14 @@ public class App {
 
         CurrentWindow.CloseWindow();
     }
+
+    public static Window getWindow() {
+        return CurrentWindow;
+    }
+
+    public static void changeFramerate(int framerate) {
+        Framerate = framerate;
+        TimeBetweenFrameCall = 1_000_000_000l/Framerate;
+    }
+
 }

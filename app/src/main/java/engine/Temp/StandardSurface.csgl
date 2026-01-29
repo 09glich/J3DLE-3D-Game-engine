@@ -54,7 +54,7 @@ in vertexOutput program;
 
 void main() { // Fragment
     vec3 Color = vec3 (0,.5,1);
-    Color = MeshColor.rgb * clamp(dot(normalize(vec3(.1,-.1,.5)), program.normal),.25,1);
+    Color = MeshColor.rgb * clamp(dot(normalize(vec3(.1,.5,.5)), program.normal),.25,1);
 
     FragColor = vec4(Color,1);
 }

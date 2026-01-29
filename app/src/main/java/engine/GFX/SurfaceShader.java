@@ -42,7 +42,7 @@ public class SurfaceShader {
         ShaderIndex = Engine_Graphics.PushShader(this);
     }
 
-    public static SurfaceShader LoadShaderFrom(String file) {
+    public static SurfaceShader LoadShaderFromFile(String file) {
         SurfaceShader newshader = new SurfaceShader();
 
         newshader.ShaderFile = new TextAsset(Path.of(file));

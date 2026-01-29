@@ -1,124 +1,101 @@
 package engine;
 
-import java.nio.file.Path;
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.joml.Matrix4f;
-
-import engine.Behaviors.Camera;
-import engine.Engine_Classes.Time;
-import engine.GFX.Material;
-import engine.GFX.Material.ShaderPropertyType;
-import engine.GFX.Mesh;
-import engine.GFX.SurfaceShader;
-import engine.Hiarachy.GameObject;
-import engine.Io.TextAsset;
+import engine.Behaviors.*;
+import engine.Hiarachy.*;
 import engine.RenderingPipeline.Engine_Graphics;
+import engine.structs.*;
+import engine.GFX.*;
+
+import engine.GFX.Material.MaterialProperty;
+import engine.GFX.Material.ShaderPropertyType;
+
+import engine.Editor.EditorGUITool.EditorGUI;
+import engine.Temp.ColorShifter;
+import engine.Temp.MovementWave;
+import engine.Temp.Spinner;
 import engine.debugging.Debug;
-import engine.structs.Color;
-import engine.structs.Quaternion;
-import engine.structs.Vector2;
-import engine.structs.Vector3;
+
 
 public class StarterApp {
-    GameObject CameraObject;
-    public Camera currentCamera;
-    Material mat;
-    Material mat2;
-
-    Mesh[] currentMeshes;
-    Mesh[] WeirdCubeMesh;
-
-    int c = 0;
-    float Ltime = 0;
-
-    Color[] cs;
-
-    public void Update() {
-        //currentCamera.setVeiwSize(CurrentWindow.getSize());
-
-        if (Time.time - Ltime > 1.0) {
-            Ltime = Time.time;
-            c++;
-            c=c%3;
-        }
-
-        //CameraObject.transform.Position = new Vector3((float)Math.sin(Math.toRadians(t.time * 180)), 0, (float)Math.cos(Math.toRadians(t.time * 180))).Scale(2.5f);
-        CameraObject.transform.Rotation = Quaternion.Euler(new Vector3(0,Time.time * 5,0));
-
-        Float SinTime = (float)Math.abs(Math.sin(Time.time + 3.14159620));
-        mat.setProperty("MeshColor", cs[c]); // CHANGED PROPERTY EVERY FRAME
-
-        for (int i = 0; i < 20; i++) 
-        {
-            Engine_Graphics.drawOnce(new Matrix4f().translate(Quaternion.Euler(0,(Time.time * 90) + ((360/20f) * i),0).transform(new Vector3(0, 5, -20)) ).rotate(Quaternion.Euler(0, Time.time * 360, 0)).scale((float)Math.sin(Time.time)), WeirdCubeMesh[0], mat);
-        }
-    }
 
     public void Start() {
-        cs = new Color[3];
-        cs[0] = Color.red;
-        cs[1] = Color.green;
-        cs[2] = Color.blue;
+        Engine_Graphics.setClearColor(new Color(.25f, .25f, .25f));
 
-        Debug.log("Loading mesh assets");
-        currentMeshes = Mesh.loadMeshFromFile(Path.of("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\RoundedCube.glb"));
-        WeirdCubeMesh = Mesh.loadMeshFromFile(Path.of("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\WeirdCube.fbx"));
+        Debug.log("Starting Scene");
+        Scene currentScene = SceneManager.newScene();
 
-        Debug.log("Loading Material and Shaders");
-        mat = new Material();
-        mat.CreateProperty("MeshColor", "Color", ShaderPropertyType.Color , new Color(0, 0, 0));
-
-        mat2 = new Material();
-        mat2.CreateProperty("MeshColor", "Color", ShaderPropertyType.Color , new Color(1, 0, 1));
-
-        SurfaceShader shader = SurfaceShader.LoadShaderFrom("C:\\\\Users\\\\16314\\\\Documents\\\\Java_Stuffs\\\\3DEngine\\\\3D_Game_Engine\\\\app\\\\src\\\\main\\\\java\\\\engine\\\\Temp\\\\StandardSurface.csgl");
-
-        mat.setShader(shader) ;
-        mat2.setShader(shader);
+        Debug.log("Setting up camera");
+        //Remember if you want to try and run the system currently you must change the directorys. I am working on making it local to the project, this will not always be the case
         
+        GameObject cameraObject = currentScene.createGameObject("Main Camera");
+        Camera currentCamera = cameraObject.addComponent(new Camera());
+        currentScene.setScenePrimaryCamera(currentCamera);
 
-        Debug.log("Setting up game objects");
+        cameraObject.addComponent(new Spinner());
 
-        CameraObject = new GameObject();
-        currentCamera = new Camera();
-        currentCamera.setParent(CameraObject);
-        currentCamera.FeildOfVeiw = 70f;
-        currentCamera.CameraMode = currentCamera.CameraMode.PERSPECTIVE;
-        currentCamera.setVeiwSize(new Vector2(1920, 1080));
+        Debug.log("Init imgui");
+
+        GameObject imguiHandler = currentScene.createGameObject("ImGUIHandeler");
+        EditorGUI gui = new EditorGUI();
+        gui.setParent(imguiHandler);
+
+        Debug.log("Setting up mesh renderer");
+        // Creating a block
+        GameObject object = currentScene.createGameObject("Block");
+        object.addComponent(new MeshFilter("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\roundedCube.glb")); 
         
+        SurfaceShader currentShader = SurfaceShader.LoadShaderFromFile("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\StandardSurface.csgl");
+        Material currentMat = new Material(currentShader);
+        Material[] mat = new Material[1];
+        currentMat.CreateProperty(new MaterialProperty("MeshColor", null, ShaderPropertyType.Color, new Color(255, 0, 255)));
+        mat[0] = currentMat;
 
-        Debug.log("Setting up mesh rendering");
+        object.addComponent(new MeshRenderer(mat));
 
-        Quaternion rotQuat = new Quaternion();
-        rotQuat.rotationXYZ(
-            (float)Math.toRadians(20),
-            (float)Math.toRadians(45),
-            (float)Math.toRadians(50)
-        );
+        object.transform.Position = new Vector3(0f,0f,-5f);
 
-        //Engine_Graphics.submitPresistant(new Matrix4f().translate(new Vector3(0,2,-5)).rotate(rotQuat), currentMeshes[0], mat, 0l);
-        //Engine_Graphics.submitPresistant(new Matrix4f().translate(new Vector3(2,0,-5)), WeirdCubeMesh[0], mat, 0l);
+        //object.addComponent(new MovementWave());
 
-        float BoxDistance = 500f;
-        for (int i = 0; i < 500; i++) {
+        Material BatchMaterial = new Material(currentShader);
+        Material[] BMA = new Material[1];
+        BMA[0] = BatchMaterial;
+        BatchMaterial.CreateProperty(new MaterialProperty("MeshColor", null, ShaderPropertyType.Color, new Color(255, 0, 255)));
+
+
+        float RandRange = 100;
+
+        for (int i = 0; i <= 500; i++) {
+            GameObject go = currentScene.createGameObject("Block");
+            go.addComponent(new MeshFilter("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\roundedCube.glb")); 
+            
             if (ThreadLocalRandom.current().nextBoolean()) {
-                if (ThreadLocalRandom.current().nextBoolean()) {
-                    Engine_Graphics.submitPresistant(new Matrix4f().translate(new Vector3((ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2 ,(ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2,(ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2)), WeirdCubeMesh[0], mat, 0l);
-                } else {
-                    Engine_Graphics.submitPresistant(new Matrix4f().translate(new Vector3((ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2 ,(ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2,(ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2)), WeirdCubeMesh[0], mat2, 0l);
-                }
-                
-            } else {
-                if (ThreadLocalRandom.current().nextBoolean()) {
-                    Engine_Graphics.submitPresistant(new Matrix4f().translate(new Vector3((ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2 ,(ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2,(ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2)), currentMeshes[0], mat, 0l);
-                } else {
-                    Engine_Graphics.submitPresistant(new Matrix4f().translate(new Vector3((ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2 ,(ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2,(ThreadLocalRandom.current().nextFloat()*BoxDistance) - BoxDistance/2)), currentMeshes[0], mat2, 0l);
-                }            }
+                go.addComponent(new MeshFilter("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\roundedCube.glb"));
+            }else {
+                go.addComponent(new MeshFilter("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\WeirdCube.fbx"));
+            }
+
+            go.addComponent(new MeshRenderer(BMA));
+
+            go.transform.Position = new Vector3(
+                (ThreadLocalRandom.current().nextFloat() * (RandRange * 2)) - RandRange,
+                (ThreadLocalRandom.current().nextFloat() * (RandRange * 2)) - RandRange,
+                (ThreadLocalRandom.current().nextFloat() * (RandRange * 2)) - RandRange
+            );
+
+            go.addComponent(new MovementWave());
         }
 
-        Debug.log("Everything is loaded");
+        GameObject ShifterGameObject = currentScene.createGameObject("ColorShifter");
+        
+        ColorShifter shifter = new ColorShifter();
+        shifter.mat = BatchMaterial;
 
-        Engine_Graphics.setClearColor(new Color(.1f, .1f, .1f));
+        ShifterGameObject.addComponent(shifter);
+
+        
+        
+
     }
 }

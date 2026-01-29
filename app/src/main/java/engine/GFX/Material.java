@@ -28,13 +28,13 @@ public class Material {
     }
     public static class MaterialProperty {
         public String CodeName;
-        public String EditorName;
+        //public String EditorName;
         public ShaderPropertyType Type;
         public Object value;
 
         public MaterialProperty(String CodeName, String Name, ShaderPropertyType PropertyType, Object Value) {
             this.CodeName = CodeName;
-            this.EditorName = Name;
+            //this.EditorName = Name;
             this.Type = PropertyType;
             this.value = Value;
         }
@@ -56,6 +56,7 @@ public class Material {
     }
 
     public Material(SurfaceShader starterShader) {
+        properties = new HashMap<String, MaterialProperty>();
         this.CurrentShader = starterShader;
         MaterialIndex = Engine_Graphics.PushMaterial(this);
     }

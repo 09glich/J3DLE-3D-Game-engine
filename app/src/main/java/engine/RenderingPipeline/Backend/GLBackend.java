@@ -211,21 +211,29 @@ public class GLBackend implements BackendGraphics {
 
     // Upload Mesh
     public int PushMesh(Mesh currentMesh) {
+        // Removing Duplicate meshes
         boolean meshAssetChanged = false;
+        int MeshIndx = 0;
         GPUMesh meshAsset = null;
         for (GPUMesh mesh : UploadedMeshes) {
             if (mesh.MeshAsset == currentMesh) {
                 meshAssetChanged = true;
                 meshAsset = mesh;
+                break;
             }
+            MeshIndx ++;
         }
-
+        
         if (meshAssetChanged && meshAsset != null) {
+            // DELETE VBO VAO VEO ENTRYS HERE TO PREVENT GPU MEMORY LEAKS
             for (VBOEntry VBO : meshAsset.VBO) {
-                
+                glDeleteBuffers(VBO.VBO);
             }
+            glDeleteVertexArrays(meshAsset.VAO);
+            UploadedMeshes.remove(MeshIndx);
         }
 
+        // Adding new meshes
         // GPU Uploading Stuff
         int VAO = glGenVertexArrays();
         int EBO = glGenBuffers();

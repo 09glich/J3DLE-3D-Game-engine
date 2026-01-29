@@ -47,4 +47,9 @@ public class Transform extends Component{
         System.err.println("Cannot set Transform parent because this component is concidered core to gameobjects");
     }
 
+    // Called by GameObject to attach its core Transform.
+    public void attachTo(GameObject go) {
+        super.setParent(go);
+    }
+
 }
