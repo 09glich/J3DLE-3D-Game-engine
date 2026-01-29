@@ -1,18 +1,29 @@
-## Getting Started
+Hello and welcome to the README on this J3DEngine
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+This engine is provided by 09glich as is for any user to use at no cost
 
-## Folder Structure
+Future implimentation Schedule
 
-The workspace contains two folders by default, where:
+shader Pre compile Loading
+Dynamic Rendering
+Uniform Handeling
 
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
+Big term Goals
 
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
+Game object Hiarachy structure
+Dynamic Rendering and batching and occlusion culling for OpenGL, Vulkan, Metal
+OpenXR Support
+FMod Implimentation
 
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
 
-## Dependency Management
+Package Big Term Goals
 
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+Physics Rigid body Structure implimentation as Package
+
+LAST WORKED ON
+
+Materials. 
+
+Got Finnished
+Dynamic rendering
+Uniform Uploading
