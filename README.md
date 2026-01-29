@@ -1,8 +1,9 @@
-Hello and welcome to the README on this J3DEngine
-
-To actualy run the engine find the java file called StarterApp.java and write your scene settup in there. I am currently working on getting a scene system working. ImGUI is also included in the project but currently does not work.
+Hello and welcome to the J3DEngine git repo
+This is an in development engine written primaraly in the Java language that takes heavy inspiration from Unity engine. This engine was made as a project to learn how engine backends actualy work
 
 This engine is provided by 09glich as is for any user to use at no cost
+
+To actualy run the engine find the java file called StarterApp.java and write your scene settup in there. I am currently working on getting a scene system working. ImGUI is also included in the project but currently does not work.
 
 All Current Features that are being worked on and may occasionaly act strangely
 
