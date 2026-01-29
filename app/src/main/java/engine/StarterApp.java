@@ -66,17 +66,14 @@ public class StarterApp {
         WeirdCubeMesh = Mesh.loadMeshFromFile(Path.of("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\WeirdCube.fbx"));
 
         Debug.log("Loading Material and Shaders");
-        TextAsset ShaderFile = new TextAsset(Path.of("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\StandardSurface.csgl"));
-
         mat = new Material();
         mat.CreateProperty("MeshColor", "Color", ShaderPropertyType.Color , new Color(0, 0, 0));
 
         mat2 = new Material();
         mat2.CreateProperty("MeshColor", "Color", ShaderPropertyType.Color , new Color(1, 0, 1));
 
-        SurfaceShader shader = new SurfaceShader();
+        SurfaceShader shader = SurfaceShader.LoadShaderFrom("C:\\\\Users\\\\16314\\\\Documents\\\\Java_Stuffs\\\\3DEngine\\\\3D_Game_Engine\\\\app\\\\src\\\\main\\\\java\\\\engine\\\\Temp\\\\StandardSurface.csgl");
 
-        shader.setShaderSourceFilePath(ShaderFile);
         mat.setShader(shader) ;
         mat2.setShader(shader);
         

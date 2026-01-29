@@ -1,5 +1,6 @@
 package engine.GFX;
 
+import java.nio.file.Path;
 import java.util.Map;
 
 import engine.GFX.Material.MaterialProperty;
@@ -34,6 +35,19 @@ public class SurfaceShader {
     }
 
     public SurfaceShader() {
+        //ShaderIndex = Engine_Graphics.PushShader(this);
+    }
+
+    public void BUILD() {
         ShaderIndex = Engine_Graphics.PushShader(this);
+    }
+
+    public static SurfaceShader LoadShaderFrom(String file) {
+        SurfaceShader newshader = new SurfaceShader();
+
+        newshader.ShaderFile = new TextAsset(Path.of(file));
+
+        newshader.BUILD();
+        return newshader;
     }
 }

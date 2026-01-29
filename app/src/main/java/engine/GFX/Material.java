@@ -50,6 +50,8 @@ public class Material {
     //
     public Material(Map<String,MaterialProperty> properties) {
         this.properties = properties;
+        this.Dirty = true;
+        
         MaterialIndex = Engine_Graphics.PushMaterial(this);
     }
 

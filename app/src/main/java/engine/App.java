@@ -1,36 +1,19 @@
 package engine;
 
-import engine.API.Graphics;
-import engine.Behaviors.Camera;
 import engine.Engine_Classes.Time;
 import engine.Engine_Classes.Window;
-import engine.GFX.Material;
-//import engine.debugging.*;
-import engine.GFX.Mesh;
-import engine.GFX.SurfaceShader;
-import engine.GFX.Material.ShaderPropertyType;
-import engine.Hiarachy.GameObject;
-import engine.Io.TextAsset;
 
-import java.nio.file.Path;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.LockSupport;
-
-import org.joml.Matrix4f;
 
 import engine.RenderingPipeline.Engine_Graphics;
 import engine.RenderingPipeline.RenderFactory;
 import engine.RenderingPipeline.RenderFactory.Backend;
 import engine.debugging.Debug;
-import engine.structs.Color;
-import engine.structs.Quaternion;
-import engine.structs.Vector2;
-import engine.structs.Vector3;
 
 
 public class App {
 
-    static int Framerate = 240;
+    static int Framerate = 144;
 
     public static void main(String[] args) throws Exception {
 

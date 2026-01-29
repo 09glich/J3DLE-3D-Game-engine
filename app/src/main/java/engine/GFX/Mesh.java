@@ -49,7 +49,7 @@ public class Mesh {
     }
 
     public Mesh() {
-        MeshIndex = Engine_Graphics.PushMesh(this);
+        //MeshIndex = Engine_Graphics.PushMesh(this);
     }
 
     public void BUILD() {
@@ -203,8 +203,9 @@ public class Mesh {
             // Color array construction
 
             // Tangant Array construction
-
+            CMesh.BUILD();
             meshOutput[meshindx] = CMesh;
+            
         }
         Assimp.aiReleaseImport(scene);
         return meshOutput;

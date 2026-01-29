@@ -206,6 +206,7 @@ public class GLBackend implements BackendGraphics {
 
         UploadedShaders = new ArrayList<>();
         UploadedMeshes = new ArrayList<>();
+        UploadedMaterials = new ArrayList<>();
     }
 
     // Upload Mesh
