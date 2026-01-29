@@ -1,0 +1,62 @@
+#shadername StandardSurface
+#GLversion 330
+#properties
+
+_Color "Current Color" Color = (1, 1, 1)
+
+
+#pass
+#vertex
+layout (location = 0) in vec3 aPos;
+layout (location = 1) in vec3 normal;
+layout (location = 2) in vec2 TEXCOORDS;
+
+uniform mat4 ModelView;
+uniform mat4 ModelViewInverse;
+uniform mat4 ViewMat;
+uniform mat4 Projection;
+
+struct vertexOutput {
+    vec3 worldPosition;
+    vec3 normal;
+    vec2 uv;
+};
+
+
+out vertexOutput program;
+
+void main() {// Vertex
+    gl_Position = (Projection * ViewMat * ModelView) * vec4(aPos , 1.0);
+
+    vertexOutput v;
+    v.worldPosition = vec3(gl_Position);
+    mat3 normalMatrix = transpose(mat3(ModelViewInverse));
+    v.normal = normalize(normalMatrix * normal);
+    v.uv = TEXCOORDS;
+
+    program = v;
+}
+#vertex end
+
+#fragment
+
+uniform vec4 MeshColor;
+
+out vec4 FragColor;
+
+struct vertexOutput {
+    vec3 worldPosition;
+    vec3 normal;
+    vec2 uv;
+};
+
+in vertexOutput program;
+
+void main() { // Fragment
+    vec3 Color = vec3 (0,.5,1);
+    Color = MeshColor.rgb * clamp(dot(normalize(vec3(.1,-.1,.5)), program.normal),.25,1);
+
+    FragColor = vec4(Color,1);
+}
+
+#fragment end
