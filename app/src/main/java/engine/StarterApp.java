@@ -7,7 +7,7 @@ import engine.Hiarachy.*;
 import engine.RenderingPipeline.Engine_Graphics;
 import engine.structs.*;
 import engine.GFX.*;
-
+import engine.GFX.Image.ImageFilterMode;
 import engine.GFX.Material.MaterialProperty;
 import engine.GFX.Material.ShaderPropertyType;
 
@@ -21,6 +21,8 @@ import engine.debugging.Debug;
 public class StarterApp {
 
     public void Start() {
+        String AssetPath = "C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\\\src\\main\\\\java\\engine";
+
         Engine_Graphics.setClearColor(new Color(.25f, .25f, .25f));
 
         Debug.log("Starting Scene");
@@ -44,12 +46,12 @@ public class StarterApp {
         Debug.log("Setting up mesh renderer");
         // Creating a block
         GameObject object = currentScene.createGameObject("Block");
-        object.addComponent(new MeshFilter("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\roundedCube.glb")); 
+        object.addComponent(new MeshFilter(AssetPath + "\\Temp\\roundedCube.glb")); 
         
-        SurfaceShader currentShader = SurfaceShader.LoadShaderFromFile("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\StandardSurface.csgl");
+        SurfaceShader currentShader = SurfaceShader.LoadShaderFromFile(AssetPath + "\\Temp\\StandardSurfaceColor.csgl");
         Material currentMat = new Material(currentShader);
         Material[] mat = new Material[1];
-        currentMat.CreateProperty(new MaterialProperty("MeshColor", null, ShaderPropertyType.Color, new Color(255, 0, 255)));
+        currentMat.CreateProperty(new MaterialProperty("MeshColor", ShaderPropertyType.Color, new Color(255, 0, 255)));
         mat[0] = currentMat;
 
         object.addComponent(new MeshRenderer(mat));
@@ -61,19 +63,19 @@ public class StarterApp {
         Material BatchMaterial = new Material(currentShader);
         Material[] BMA = new Material[1];
         BMA[0] = BatchMaterial;
-        BatchMaterial.CreateProperty(new MaterialProperty("MeshColor", null, ShaderPropertyType.Color, new Color(255, 0, 255)));
+        BatchMaterial.CreateProperty(new MaterialProperty("MeshColor", ShaderPropertyType.Color, new Color(255, 0, 255)));
 
 
         float RandRange = 100;
 
         for (int i = 0; i <= 500; i++) {
             GameObject go = currentScene.createGameObject("Block");
-            go.addComponent(new MeshFilter("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\roundedCube.glb")); 
+            go.addComponent(new MeshFilter(AssetPath + "\\Temp\\roundedCube.glb")); 
             
-            if (ThreadLocalRandom.current().nextBoolean()) {
-                go.addComponent(new MeshFilter("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\roundedCube.glb"));
+            if (ThreadLocalRandom.current().nextFloat() >= .5f) {
+                go.addComponent(new MeshFilter(AssetPath + "\\Temp\\roundedCube.glb"));
             }else {
-                go.addComponent(new MeshFilter("C:\\Users\\16314\\Documents\\Java_Stuffs\\3DEngine\\3D_Game_Engine\\app\\src\\main\\java\\engine\\Temp\\WeirdCube.fbx"));
+                go.addComponent(new MeshFilter(AssetPath + "\\Temp\\WeirdCube.fbx"));
             }
 
             go.addComponent(new MeshRenderer(BMA));
@@ -94,8 +96,26 @@ public class StarterApp {
 
         ShifterGameObject.addComponent(shifter);
 
+        // Companion Cube
+        GameObject CompanionCube = currentScene.createGameObject("CompanionCube");
+        CompanionCube.addComponent(new MeshFilter(AssetPath + "\\Temp\\CompanionCube.fbx"));
+
+        SurfaceShader textureShader = SurfaceShader.LoadShaderFromFile(AssetPath + "\\Temp\\StandardSurfaceTexture.csgl");
+        Image companionTexture = Image.LoadImageFromFile(AssetPath + "\\Temp\\CompanionCube.png");
+        companionTexture.setFilterMode(ImageFilterMode.NEAREST);
+
+        Material companionMaterial = new Material(textureShader);
+        Material[] compMatBatch = new Material[1];
+        compMatBatch[0] = companionMaterial;
+
+        companionMaterial.CreateProperty("_Texture", ShaderPropertyType.Sampler2D, companionTexture);
+
+        CompanionCube.addComponent(new MeshRenderer(compMatBatch));
+
+        CompanionCube.transform.Position = new Vector3(-2,0, -2);
         
-        
+
+
 
     }
 }

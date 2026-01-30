@@ -8,20 +8,19 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import engine.Behaviors.Camera;
 import engine.GFX.*;
 import engine.GFX.Material.MaterialProperty;
+import engine.GFX.Image.*;
 import engine.structs.*;
 
-import engine.ClassHelpers.ListHelper;
 
 import org.joml.Matrix4f;
 import  org.lwjgl.BufferUtils;
+
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryStack;
 
@@ -84,6 +83,7 @@ public class GLBackend implements BackendGraphics {
     private List<GPUMesh> UploadedMeshes;
     private List<GPUShader> UploadedShaders;
     private List<Material> UploadedMaterials;
+    private List<GPUImage> UploadedImages;
 
     private List<RenderSubmission> PresistantSubmissions;
     private List<RenderSubmission> PerFrameSubmissions;
@@ -149,6 +149,8 @@ public class GLBackend implements BackendGraphics {
             glBindVertexArray(mesh.VAO);
             glDrawElements(GL_TRIANGLES, mesh.IndecieCount, GL_UNSIGNED_INT, 0);
 
+            UniformUploader.ResetIncro();
+
             
         } 
     }
@@ -184,6 +186,8 @@ public class GLBackend implements BackendGraphics {
 
             glBindVertexArray(mesh.VAO);
             glDrawElements(GL_TRIANGLES, mesh.IndecieCount, GL_UNSIGNED_INT, 0);
+
+            UniformUploader.ResetIncro();
         }
     }
 
@@ -207,6 +211,7 @@ public class GLBackend implements BackendGraphics {
         UploadedShaders = new ArrayList<>();
         UploadedMeshes = new ArrayList<>();
         UploadedMaterials = new ArrayList<>();
+        UploadedImages = new ArrayList<>();
     }
 
     // Upload Mesh
@@ -338,7 +343,67 @@ public class GLBackend implements BackendGraphics {
 
     // Upload Image
     public int PushImage(Image img) {
-        return -1;
+
+        boolean replace = false;
+        int indx = 0;
+        for (GPUImage imgs : UploadedImages) {
+            if (img == imgs.original) {
+                glDeleteTextures(imgs.ImageBuffer);
+                replace = true;
+                break;
+            }
+            indx ++;
+        }
+
+        int TexId = glGenTextures();
+        glBindTexture(GL_TEXTURE_2D, TexId);
+        glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+
+        // Image Binding
+
+        int ColorMode = GL_RGB;
+
+        if (img.getChannels() == 4) {
+            ColorMode = GL_RGBA;
+        }else if (img.getChannels() == 2) {
+            ColorMode = GL_RG;
+        }else if (img.getChannels() == 1) {
+            ColorMode = GL_R;
+        }
+        glTexImage2D(GL_TEXTURE_2D, 0, ColorMode, img.getWidth(), img.getHeight(), 0, ColorMode, GL_UNSIGNED_BYTE, img.getBuffer());
+
+        // Filter Mode
+        int Mode = ((img.getFilterMode() == ImageFilterMode.LINEAR) ? GL_LINEAR : GL_NEAREST);
+        int MinMode = ((img.getMipMode() == MipmapMode.ENABLED) ? ((img.getFilterMode() == ImageFilterMode.LINEAR) ? GL_LINEAR_MIPMAP_LINEAR : GL_NEAREST_MIPMAP_NEAREST) : Mode);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, MinMode);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, Mode); 
+
+        // Wrap
+
+        ImageWrapMode WM = img.getWrapMode();
+        int WrapModeX = ((WM == ImageWrapMode.REPEAT || WM == ImageWrapMode.CLAMPY) ? GL_REPEAT : GL_CLAMP);
+        int WrapModeY = ((WM == ImageWrapMode.REPEAT || WM == ImageWrapMode.CLAMPX) ? GL_REPEAT : GL_CLAMP);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, WrapModeX);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, WrapModeY);
+
+        // Generate Mips
+        if (img.getMipMode() == MipmapMode.ENABLED) {
+            glGenerateMipmap(GL_TEXTURE_2D);
+        }
+
+        GPUImage imgLog = new GPUImage();
+        imgLog.ImageBuffer = TexId;
+        imgLog.original = img;
+
+        if (replace) {
+            UploadedImages.set(indx, imgLog);
+        } else {
+            UploadedImages.add(imgLog);
+        }
+
+        return TexId;
     }
 
 
@@ -403,8 +468,6 @@ public class GLBackend implements BackendGraphics {
     public void endFrame() {
         PerFrameSubmissions.clear();
     }
-
-    
 }
 
 // Other Classes
@@ -426,34 +489,6 @@ class RenderSubmission {
             ((long)this.currentMesh << 16)
         );
     }
-}
-
-class ShaderQuePoint {
-    GPUShader ActiveShader;
-    List<MaterialQuePoint> Materials;
-
-    ShaderQuePoint (GPUShader Shader) {
-        Materials = new ArrayList<MaterialQuePoint>();
-        ActiveShader = Shader;
-    }
-}
-class MaterialQuePoint {
-    Material ActiveMaterial;
-    List<MeshQuePoint> Mesh;
-
-    MaterialQuePoint (Material mat) {
-        this.Mesh = new ArrayList<MeshQuePoint>();
-        ActiveMaterial = mat;
-    }
-} 
-class MeshQuePoint {
-    GPUMesh ActiveMaterial;
-    List<Matrix4f> Mesh;
-
-    MeshQuePoint (GPUMesh mat) {
-        this.Mesh = new ArrayList<Matrix4f>();
-        ActiveMaterial = mat;
-    } 
 }
 
 
@@ -615,19 +650,42 @@ class UniformUploader {
         }
     } 
 
+    static int textureUint = 0;
+    public static void UploadUniform(String name, int program, Image img) {
+        int location = glGetUniformLocation(program, name);
+        
+        if (location == -1) {
+            glActiveTexture(GL_TEXTURE0 + textureUint);
+            glBindTexture(GL_TEXTURE_2D, img.getImageIndex());
+            glUniform1i(location, textureUint);
+            textureUint ++;
+        }
+    }
+
     public static void UploadUniform(String name, int program, Object value) {
         if (value instanceof Vector3 v) { UploadUniform(name, program, v); }
         else if (value instanceof Vector2 v) { UploadUniform(name, program, v); }
         else if (value instanceof Color c) { UploadUniform(name, program, c); }
         else if (value instanceof Integer i) { UploadUniform(name, program, i); }
         else if (value instanceof Float f) { UploadUniform(name, program, f); }
+        else if (value instanceof Image i) { UploadUniform(name, program, i);}
         else { throw new IllegalArgumentException("Unsupported uniform type"); }
+    }
+
+    public static void ResetIncro () {
+        textureUint = 0;
     }
 
 }
 
 class GPUShader {
     int FullProgram;
+
+}
+
+class GPUImage {
+    Image original;
+    int ImageBuffer;
 }
 
 class VBOEntry {

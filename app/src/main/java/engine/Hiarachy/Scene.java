@@ -5,7 +5,6 @@ import java.util.List;
 
 import engine.Behaviors.Camera;
 import engine.Behaviors.Component;
-import engine.debugging.Debug;
 
 public class Scene {
     private final List<GameObject> gameObjects = new ArrayList<>();

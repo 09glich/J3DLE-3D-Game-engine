@@ -28,13 +28,11 @@ public class Material {
     }
     public static class MaterialProperty {
         public String CodeName;
-        //public String EditorName;
         public ShaderPropertyType Type;
         public Object value;
 
-        public MaterialProperty(String CodeName, String Name, ShaderPropertyType PropertyType, Object Value) {
+        public MaterialProperty(String CodeName, ShaderPropertyType PropertyType, Object Value) {
             this.CodeName = CodeName;
-            //this.EditorName = Name;
             this.Type = PropertyType;
             this.value = Value;
         }
@@ -112,8 +110,8 @@ public class Material {
         return true;
     }
 
-    public void CreateProperty(String CodeName, String Name, ShaderPropertyType PropertyType, Object Value) {
-        this.properties.put(CodeName, new MaterialProperty(CodeName, Name, PropertyType, Value));
+    public void CreateProperty(String CodeName, ShaderPropertyType PropertyType, Object Value) {
+        this.properties.put(CodeName, new MaterialProperty(CodeName, PropertyType, Value));
     }
 
     public void CreateProperty(MaterialProperty property) {

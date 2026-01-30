@@ -184,7 +184,7 @@ public class Mesh {
             //int UVBL = UVBuffer.limit();
 
             if (UVBuffer != null) {
-                for(int VertexIndex = 0; VertexIndex < vertexCount; VertexIndex++) {
+                for(int VertexIndex = 0; VertexIndex < UVBuffer.limit(); VertexIndex++) {
                     Vertex vert = CMesh.Verticies[VertexIndex];
                     AIVector3D uvCoord = UVBuffer.get(VertexIndex);
 
