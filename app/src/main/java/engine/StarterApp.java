@@ -4,15 +4,15 @@ import java.util.concurrent.ThreadLocalRandom;
 
 import engine.Behaviors.*;
 import engine.Hiarachy.*;
+import engine.Packages.Editor.EditorGUITool.EditorGUIInitializer;
 import engine.RenderingPipeline.Engine_Graphics;
 import engine.structs.*;
 import engine.GFX.*;
 import engine.GFX.Image.ImageFilterMode;
 import engine.GFX.Material.MaterialProperty;
 import engine.GFX.Material.ShaderPropertyType;
-
-import engine.Editor.EditorGUITool.EditorGUI;
 import engine.Temp.ColorShifter;
+import engine.Temp.ImGUITester;
 import engine.Temp.MovementWave;
 import engine.Temp.Spinner;
 import engine.debugging.Debug;
@@ -40,8 +40,8 @@ public class StarterApp {
         Debug.log("Init imgui");
 
         GameObject imguiHandler = currentScene.createGameObject("ImGUIHandeler");
-        EditorGUI gui = new EditorGUI();
-        gui.setParent(imguiHandler);
+        EditorGUIInitializer gui = new EditorGUIInitializer();
+        imguiHandler.addComponent(gui);
 
         Debug.log("Setting up mesh renderer");
         // Creating a block
@@ -114,8 +114,10 @@ public class StarterApp {
 
         CompanionCube.transform.Position = new Vector3(-2,0, -2);
         
-
-
+        GameObject IGUITest = currentScene.createGameObject("IMGUITester");
+        IGUITest.addComponent(new ImGUITester());
+        
+        
 
     }
 }

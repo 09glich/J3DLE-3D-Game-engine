@@ -35,6 +35,15 @@ public class Scene {
         }
     }
 
+
+    public void AfterRender () {
+        for (GameObject go : gameObjects) {
+            for (Component c : go.getAllComponents()) {
+                c.afterRender();
+            }
+        }
+    }
+
     public void setScenePrimaryCamera(Camera camera) {
         currentCamera = camera;
     }

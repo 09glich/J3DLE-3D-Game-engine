@@ -9,7 +9,6 @@ public final class SceneManager {
     public static Scene getActiveScene() { return activeScene; }
     public static Scene newScene() {Scene currentScene = new Scene(); activeScene = currentScene; return currentScene;}
 
-    public static void update() {
-        if (activeScene != null) activeScene.update();
-    }
+    public static void update() {if (activeScene != null) activeScene.update();}
+    public static void afterRender() {if(activeScene != null) activeScene.AfterRender();}
 }

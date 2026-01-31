@@ -12,6 +12,7 @@ public class Component {
     // Lifecycle (override in subclasses)
     public void start() {}
     public void update() {}
+    public void afterRender() {}
 
     public final void engineStart() {
         if (!started) {
@@ -23,6 +24,12 @@ public class Component {
     public final void engineUpdate() {
         if (enabled) {
             update();
+        }
+    }
+
+    public final void engineAfterRender() {
+        if (enabled) {
+            afterRender();
         }
     }
 

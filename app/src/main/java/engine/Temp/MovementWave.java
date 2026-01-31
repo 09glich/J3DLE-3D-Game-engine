@@ -1,12 +1,11 @@
 package engine.Temp;
 
 import engine.Engine_Classes.Time;
-import engine.debugging.Debug;
+
 import engine.structs.*;
 
 import java.util.concurrent.ThreadLocalRandom;
 
-import org.joml.Vector3f;
 
 import engine.Behaviors.Component;
 

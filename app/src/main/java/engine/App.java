@@ -49,8 +49,10 @@ public class App {
             SceneManager.getActiveScene().getScenePrimaryCamera().setVeiwSize(CurrentWindow.getSize());
             Engine_Graphics.renderCamera(SceneManager.getActiveScene().getScenePrimaryCamera());
             
-            CurrentWindow.WindowUpdate();
             Engine_Graphics.endFrame();
+
+            SceneManager.afterRender();
+            CurrentWindow.WindowUpdate();
 
             long elapsed = System.nanoTime() - fs;
             long remaining = TimeBetweenFrameCall - elapsed;
