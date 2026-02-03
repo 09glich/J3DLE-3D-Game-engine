@@ -2,6 +2,8 @@ package engine;
 
 import engine.Engine_Classes.Time;
 import engine.Engine_Classes.Window;
+import engine.Engine_Classes.Window.VSyncMode;
+import engine.Engine_Classes.Window.windowMode;
 import engine.Hiarachy.SceneManager;
 
 import java.util.concurrent.locks.LockSupport;
@@ -14,7 +16,7 @@ import engine.debugging.Debug;
 
 public class App {
 
-    static private int Framerate = 144;
+    static private int Framerate = 240;
     static private long TimeBetweenFrameCall;
     static private Window CurrentWindow;
 
@@ -24,7 +26,9 @@ public class App {
 
         CurrentWindow = new Window();
 
-        CurrentWindow.Start(); 
+        CurrentWindow.Start();
+        //CurrentWindow.setWindowedMode(windowMode.WINDOWED);
+        CurrentWindow.setVsyncMode(VSyncMode.DISABLED); 
 
         Debug.log("Init Graphics");
         RenderFactory.init(Backend.OPENGL);

@@ -1,5 +1,6 @@
 package engine.Temp;
 
+import engine.App;
 import engine.Behaviors.Component;
 import engine.Engine_Classes.Window;
 import engine.Packages.Editor.EditorGUITool.Classes.EditorGUIWindow;
@@ -11,9 +12,20 @@ public class ImGUITester extends Component{
     WindowButton button;
     WindowToggleButton toggleButton;
 
+    boolean vsyncEnabled; 
     @Override
     public void update() {
         if (button.buttonPressed()) System.out.println("Button Pressed");
+
+        //if (toggleButton.buttonPressed())  {
+        //    
+        //    App.getWindow().setVsyncMode(Window.VSyncMode.ENABLED);
+        //}
+        //else
+        //{
+        //    App.getWindow().setVsyncMode(Window.VSyncMode.DISABLED);
+        //}
+        
         
     }
 
@@ -24,7 +36,7 @@ public class ImGUITester extends Component{
         EditorGUIWindow guiwindow = new EditorGUIWindow("Window");
         guiwindow.addTextLabel("Hello world");
         button = guiwindow.addButton("Press me");
-        toggleButton = guiwindow.addToggleButton("String one", "String two");
+        toggleButton = guiwindow.addToggleButton("Vsync Enabled", "Vsync Disabled");
 
 
     }

@@ -87,7 +87,7 @@ public class EditorGUIWindow extends BaseEditorGUI{
         public void setText(String Text1, String Text2) { Text = new String[2]; Text[0] = Text1; Text[1] = Text2;}
 
         WindowToggleButton () { super(); }
-        WindowToggleButton (String Text1, String Text2) { super(); }
+        WindowToggleButton (String Text1, String Text2) { super(); setText(Text1, Text2);}
     }
     public WindowToggleButton addToggleButton(String Text1, String Text2) {
         WindowToggleButton Toggle = new WindowToggleButton(Text1, Text2);

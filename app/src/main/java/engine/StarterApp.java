@@ -68,7 +68,7 @@ public class StarterApp {
 
         float RandRange = 100;
 
-        for (int i = 0; i <= 500; i++) {
+        for (int i = 0; i <= 20; i++) {
             GameObject go = currentScene.createGameObject("Block");
             go.addComponent(new MeshFilter(AssetPath + "\\Temp\\roundedCube.glb")); 
             

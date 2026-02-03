@@ -11,10 +11,48 @@ public class Vector3 extends Vector3f {
     }
 
     public Vector3 Scale(float Scale) {
-        this.x = this.x * Scale;
-        this.y = this.y * Scale;
-        this.z = this.z * Scale;
+        return mul(Scale);
+    }
 
+    public Vector3 add(Vector3 other) {
+        this.x += other.x;
+        this.y += other.y;
+        this.z += other.z;
+        return this;
+    }
+
+    public Vector3 sub(Vector3 other) {
+        this.x -= other.x;
+        this.y -= other.y;
+        this.z -= other.z;
+        return this;
+    }
+
+    public Vector3 mul(Vector3 other) {
+        this.x *= other.x;
+        this.y *= other.y;
+        this.z *= other.z;
+        return this;
+    }
+
+    public Vector3 div(Vector3 other) {
+        this.x /= other.x;
+        this.y /= other.y;
+        this.z /= other.z;
+        return this;
+    }
+
+    public Vector3 mul(float scalar) {
+        this.x *= scalar;
+        this.y *= scalar;
+        this.z *= scalar;
+        return this;
+    }
+
+    public Vector3 div(float scalar) {
+        this.x /= scalar;
+        this.y /= scalar;
+        this.z /= scalar;
         return this;
     }
 

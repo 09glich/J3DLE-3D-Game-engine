@@ -6,13 +6,15 @@ To actualy run the engine find the java file called StarterApp.java and write yo
 
 All Current Features that are being worked on and may occasionaly act strangely
 
+The Input system package is currently being tweeked
 The full implimentation of the OpenGL Graphics pipeline Component workflow is being tweeked
 
 All Current Features include
 
-3D Rendering Meshes, Materials, Shaders Images
+3D Rendering Meshes, Materials, Shaders, Images
 Component Based Scene workflow (Simalar to unity engine) Custom Components can be added to the system 
 Time Class. Delta time Engine Time. Game time
+DearImGUI partial implimentation with Text, Buttons, Toggles, Image Buttons.
 
 Future features will include the folowing
 
