@@ -2,6 +2,12 @@ package engine.structs;
 
 import org.joml.Quaternionf;
 public class Quaternion extends Quaternionf {
+
+    public Quaternion copy() {
+        Quaternion q = new Quaternion();
+        q.set(this);
+        return q;
+    }
     
 
     public static Quaternion Euler(float X, float Y, float Z) {

@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import engine.Behaviors.*;
 import engine.Hiarachy.*;
 import engine.Packages.Editor.EditorGUITool.EditorGUIInitializer;
+import engine.Packages.InputSystem.InputManager;
 import engine.RenderingPipeline.Engine_Graphics;
 import engine.structs.*;
 import engine.GFX.*;
@@ -12,6 +13,7 @@ import engine.GFX.Image.ImageFilterMode;
 import engine.GFX.Material.MaterialProperty;
 import engine.GFX.Material.ShaderPropertyType;
 import engine.Temp.ColorShifter;
+import engine.Temp.FreeCamera;
 import engine.Temp.ImGUITester;
 import engine.Temp.MovementWave;
 import engine.Temp.Spinner;
@@ -28,6 +30,9 @@ public class StarterApp {
         Debug.log("Starting Scene");
         Scene currentScene = SceneManager.newScene();
 
+        GameObject InputManager =  currentScene.createGameObject("SceneManager");
+        InputManager.addComponent(new InputManager());
+
         Debug.log("Setting up camera");
         //Remember if you want to try and run the system currently you must change the directorys. I am working on making it local to the project, this will not always be the case
         
@@ -35,7 +40,7 @@ public class StarterApp {
         Camera currentCamera = cameraObject.addComponent(new Camera());
         currentScene.setScenePrimaryCamera(currentCamera);
 
-        cameraObject.addComponent(new Spinner());
+        cameraObject.addComponent(new FreeCamera());
 
         Debug.log("Init imgui");
 

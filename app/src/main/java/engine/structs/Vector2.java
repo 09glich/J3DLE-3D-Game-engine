@@ -10,6 +10,10 @@ public class Vector2 extends Vector2f {
         this.y = y;
     }
 
+    public Vector2 copy() {
+        return new Vector2(this.x, this.y);
+    }
+
     public static Vector2 up =    new Vector2(0,1);
     public static Vector2 down =  new Vector2(0,-1);
     public static Vector2 left =  new Vector2(1,0);

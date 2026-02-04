@@ -15,7 +15,7 @@ public class ImGUITester extends Component{
     boolean vsyncEnabled; 
     @Override
     public void update() {
-        if (button.buttonPressed()) System.out.println("Button Pressed");
+        //if (button.buttonPressed()) System.out.println("Button Pressed");
 
         //if (toggleButton.buttonPressed())  {
         //    
@@ -33,10 +33,10 @@ public class ImGUITester extends Component{
     public void start() {
         System.out.println("ImGUI Tester Starting");
 
-        EditorGUIWindow guiwindow = new EditorGUIWindow("Window");
-        guiwindow.addTextLabel("Hello world");
-        button = guiwindow.addButton("Press me");
-        toggleButton = guiwindow.addToggleButton("Vsync Enabled", "Vsync Disabled");
+        //EditorGUIWindow guiwindow = new EditorGUIWindow("Window");
+        //guiwindow.addTextLabel("Hello world");
+        //button = guiwindow.addButton("Press me");
+        //toggleButton = guiwindow.addToggleButton("Vsync Enabled", "Vsync Disabled");
 
 
     }
