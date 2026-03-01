@@ -21,7 +21,7 @@ public final class Engine_Graphics {
 
     //Draw
     public static void drawOnce(Matrix4f meshMatrix, Mesh currentMesh, Material material) {backend.drawOnce(meshMatrix, currentMesh, material);}
-    public static void submitPresistant(Matrix4f meshMatrix, Mesh currentMesh, Material material, Long Layer) {backend.submitPresistant(meshMatrix, currentMesh, material, Layer);}
+    public static int submitPresistant(Matrix4f meshMatrix, Mesh currentMesh, Material material, Long Layer) {return backend.submitPresistant(meshMatrix, currentMesh, material, Layer);}
     public static void removePresistant(int indx) {}
     public static void ClearAllPresistant() {}
 

@@ -3,8 +3,10 @@ package engine;
 import java.util.concurrent.ThreadLocalRandom;
 
 import engine.Behaviors.*;
+import engine.Behaviors.Camera.CameraClearMode;
 import engine.Hiarachy.*;
 import engine.Packages.Editor.EditorGUITool.EditorGUIInitializer;
+import engine.Packages.Editor.EditorMainUI.EditorUIPrimary;
 import engine.Packages.InputSystem.InputManager;
 import engine.RenderingPipeline.Engine_Graphics;
 import engine.structs.*;
@@ -38,6 +40,7 @@ public class StarterApp {
         
         GameObject cameraObject = currentScene.createGameObject("Main Camera");
         Camera currentCamera = cameraObject.addComponent(new Camera());
+        currentCamera.ClearMode = CameraClearMode.NONE;
         currentScene.setScenePrimaryCamera(currentCamera);
 
         cameraObject.addComponent(new FreeCamera());
@@ -72,9 +75,10 @@ public class StarterApp {
 
 
         float RandRange = 100;
+        GameObject cubes = currentScene.createGameObject("Blocks");
 
-        for (int i = 0; i <= 20; i++) {
-            GameObject go = currentScene.createGameObject("Block");
+        for (int i = 0; i <= 500; i++) {
+            GameObject go = currentScene.createGameObject("Block" + i);
             go.addComponent(new MeshFilter(AssetPath + "\\Temp\\roundedCube.glb")); 
             
             if (ThreadLocalRandom.current().nextFloat() >= .5f) {
@@ -92,6 +96,7 @@ public class StarterApp {
             );
 
             go.addComponent(new MovementWave());
+            go.setParent(cubes);
         }
 
         GameObject ShifterGameObject = currentScene.createGameObject("ColorShifter");
@@ -119,10 +124,11 @@ public class StarterApp {
 
         CompanionCube.transform.Position = new Vector3(-2,0, -2);
         
-        GameObject IGUITest = currentScene.createGameObject("IMGUITester");
-        IGUITest.addComponent(new ImGUITester());
-        
-        
+        //EditorGUI
+
+        GameObject EditorGUIGO = currentScene.createGameObject("EditorGUI");
+        EditorGUIGO.addComponent(new EditorUIPrimary());
+
 
     }
 }

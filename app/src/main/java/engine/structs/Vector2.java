@@ -4,6 +4,7 @@ import org.joml.Vector2f;
 import org.joml.Vector2fc;
 
 public class Vector2 extends Vector2f {
+    public static final float DEFAULT_EPSILON = 0.0001f;
 
     public Vector2(float x, float y) {
         this.x = x;
@@ -56,5 +57,23 @@ public class Vector2 extends Vector2f {
         this.x /= scalar;
         this.y /= scalar;
         return this;
+    }
+
+    public boolean equals(Vector2 other) {
+        return equals(other, DEFAULT_EPSILON);
+    }
+
+    public boolean equals(Vector2 other, float epsilon) {
+        if (other == null) {
+            return false;
+        }
+        return Math.abs(this.x - other.x) <= epsilon
+            && Math.abs(this.y - other.y) <= epsilon;
+    }
+
+    public boolean equalsExact(Vector2 other) {
+        return other != null
+            && this.x == other.x
+            && this.y == other.y;
     }
 }

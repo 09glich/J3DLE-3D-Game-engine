@@ -151,6 +151,7 @@ public class Window {
     public void updateWindowDockMode() {
         if (Mode == windowMode.WINDOWED) {
             GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_TRUE);
+            GLFW.glfwSetWindowMonitor(window,0,0,0,1920, 1080, GLFW.GLFW_DONT_CARE);
         } else if (Mode == windowMode.FULLSCREEN) {
             GLFW.glfwSetWindowAttrib(window, GLFW.GLFW_DECORATED, GLFW.GLFW_FALSE);
             GLFWVidMode mode = GLFW.glfwGetVideoMode(PrimaryMonitor);

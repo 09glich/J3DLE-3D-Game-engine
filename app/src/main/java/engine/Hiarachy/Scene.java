@@ -28,10 +28,7 @@ public class Scene {
 
     public void update() {
         for (GameObject go : gameObjects) {
-            for (Component c : go.getAllComponents()) {
-                c.engineStart();
-                c.engineUpdate();
-            }
+            go.UpdateCall();
         }
     }
 

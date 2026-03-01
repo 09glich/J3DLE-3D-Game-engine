@@ -1,5 +1,6 @@
 package engine.Behaviors;
 
+import engine.Hiarachy.ComponentRegistry;
 import engine.Hiarachy.GameObject;
 
 public class Component {
@@ -8,11 +9,17 @@ public class Component {
     private Transform transform;
     private boolean started = false;
     private boolean enabled = true;
+    private boolean awoken = false;
+
+    private static boolean Registered = false;
+
+    
 
     // Lifecycle (override in subclasses)
     public void start() {}
     public void update() {}
     public void afterRender() {}
+    public void awake() {}
 
     public final void engineStart() {
         if (!started) {
@@ -20,16 +27,24 @@ public class Component {
             start();
         }
     }
-
     public final void engineUpdate() {
         if (enabled) {
             update();
         }
     }
-
     public final void engineAfterRender() {
         if (enabled) {
             afterRender();
+        }
+    }
+    public final void engineAwake() {
+        if (Registered == false) {
+            ComponentRegistry.register(getClass().getSimpleName(), getClass());
+        }
+
+        if (awoken) {
+            awoken = true;
+            awake();
         }
     }
 

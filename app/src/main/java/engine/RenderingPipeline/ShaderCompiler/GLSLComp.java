@@ -9,8 +9,11 @@ import java.util.List;
 import java.util.Map;
 
 import  engine.ClassHelpers.StringHelper;
-
+import engine.GFX.Material.MaterialProperty;
 import engine.GFX.Material.ShaderPropertyType;
+import engine.structs.Color;
+import engine.structs.Vector2;
+import engine.structs.Vector3;
 
 
 public class GLSLComp {
@@ -25,7 +28,7 @@ public class GLSLComp {
         public String ShaderName;
         private int GLVersion = 330;
         public List <GLSLShaderPass> ShaderPasses;
-        public Map<String, ShaderPropertyType> ShaderPropertys;
+        public Map<String, MaterialProperty> ShaderPropertys;
 
         public void Addpass(GLSLShaderPass pass) {
             ShaderPasses.add(pass);
@@ -88,7 +91,7 @@ public class GLSLComp {
 
         public GLSurfaceShader() {
             ShaderPasses = new ArrayList<GLSLShaderPass>();
-            ShaderPropertys = new HashMap<String,ShaderPropertyType>();
+            ShaderPropertys = new HashMap<String,MaterialProperty>();
         }
     }
 
@@ -97,6 +100,117 @@ public class GLSLComp {
         public String Fragment;
     }
 
+    
+    public static Map<String, MaterialProperty> getMaterialPropertys(String Input) {
+        Map<String,MaterialProperty> Props = new HashMap<>();
+
+        BufferedReader stringLines = new BufferedReader(new StringReader(Input));
+
+        try {
+            int Line = 0;
+            for (String line; (line = stringLines.readLine()) != null;) {
+                Line++;
+                if (line.startsWith("#P")) {
+                    String[] Propertys = line.split(" ");
+                    if (Propertys[0].equals("#P")) {
+                        ShaderPropertyType ptype = ShaderPropertyType.Bool;
+                        Object Property = null;
+
+                        if (Propertys.length <= 3) {throw new RuntimeException("Property present but data not found. Line " + Line ); }
+
+                        if (Propertys[2] == "Float") {
+                            ptype = ShaderPropertyType.Float;
+
+                            try {
+                                Property = Float.parseFloat(Propertys[3]);
+                            } catch(NumberFormatException error) {
+                                throw new RuntimeException("Failed to parse float. Reason: Malformed at line :" + Line + "with this error " + error);
+                            }
+                        } else if (Propertys[2] == "Int") {
+                            ptype = ShaderPropertyType.Int;
+
+                            try {
+                                Property = Integer.parseInt(Propertys[3]);
+                            } catch(NumberFormatException error) {
+                                throw new RuntimeException("Failed to parse int. Reason: Malformed at line :" + Line + "with this error " + error);
+                            }
+                            
+                        } else if (Propertys[2] == "Boolean") {
+                            ptype = ShaderPropertyType.Bool;
+
+                            if (Propertys[3].toLowerCase().equals("true")) {
+                                Property = true;
+                            } else if (Propertys[3].toLowerCase().equals("false")) {
+                                Property = false;
+                            } else {
+                                throw new RuntimeException("Failed to parse boolean. expected true or false got " + Propertys[3]+ " Line : " + Line);
+                            }
+
+                        } else if (Propertys[2] == "Color") {
+                            ptype = ShaderPropertyType.Color;
+
+                            Color c = new Color();
+
+                            try {
+                                c.setR(Float.parseFloat(Propertys[4]));
+                                c.setG(Float.parseFloat(Propertys[5]));
+                                c.setB(Float.parseFloat(Propertys[6]));
+                                c.setA(Float.parseFloat(Propertys[7]));
+                            } catch (NumberFormatException error) {
+                                throw new RuntimeException("Failed to parse Color. Malformed Input. Line : " + Line);
+                            }
+
+                            Property = c;
+
+                        } else if (Propertys[2] == "Vector3") {
+                            ptype = ShaderPropertyType.Vector3;
+
+                            Vector3 vec = new Vector3(0,0,0);
+
+                            try {
+                                vec.x = Float.parseFloat(Propertys[4]);
+                                vec.y = Float.parseFloat(Propertys[5]);
+                                vec.z = Float.parseFloat(Propertys[6]);
+                            } catch (NumberFormatException error) {
+                                throw new RuntimeException("Failed to parse Color. Malformed Input. Line : " + Line);
+                            }
+
+                            Property = vec;
+                        } else if (Propertys[2] == "Vector2") {
+                            ptype = ShaderPropertyType.Vector2;
+
+                            Vector2 vec = new Vector2(0,0);
+                            try {
+                                vec.x = Float.parseFloat(Propertys[4]);
+                                vec.y = Float.parseFloat(Propertys[5]);
+                                
+                            } catch (NumberFormatException error) {
+                                throw new RuntimeException("Failed to parse Color. Malformed Input. Line : " + Line);
+                            }
+
+                            Property = vec;
+                        } else if (Propertys[2] == "Image") {
+                            ptype = ShaderPropertyType.Sampler2D;
+
+                            Property = null;
+
+                        } else if (Propertys[2] == "ImageCube") {
+                            ptype = ShaderPropertyType.SamplerCubed;
+
+                            Property = null;
+                        }
+
+                        MaterialProperty property1 = new MaterialProperty(Propertys[1], ptype, Propertys);
+                        Props.put(Propertys[1], property1);
+                    }
+                }
+            }
+        } catch ( IOException e ) {
+
+        }
+
+        return Props;
+    }
 
     public static GLSurfaceShader DecompileFromString(String string) {
         GLSurfaceShader shaderOutput = new GLSurfaceShader();
@@ -104,6 +218,7 @@ public class GLSLComp {
 
         shaderApplyLayer CurrentLayer = shaderApplyLayer.NONE;
 
+        shaderOutput.ShaderPropertys = getMaterialPropertys(string);
 
         BufferedReader br = new BufferedReader(new StringReader(string));
         try {
@@ -128,12 +243,14 @@ public class GLSLComp {
                         } else {
                             CurrentLayer = shaderApplyLayer.FRAGMENT;
                         }
-                    } else if (program[0].equals("#properties")) { // Propertys Key Switch
+
+                    } else if (program[0].equals("#p")) {
                     } else if (program[0].equals("#pass")) {
                         currentPass = shaderOutput.GetNewpass();
                     } else if (program[0].equals("#glversion")) {
                         shaderOutput.SetVersion(Integer.parseInt(program[1]));
                     } else if (program[0].equals("#shadername")) {
+                        System.out.println(program[1]);
                         shaderOutput.ShaderName = program[1];
                     } else  {
                         throw new ShaderParseExeption("Cannot parse shader because tag not recognized. Key:" + program[0] + " Line:" + LineNumber);
@@ -152,13 +269,7 @@ public class GLSLComp {
                     }
                 }
                     
-                if (CurrentLayer == shaderApplyLayer.PROPERTYS) {
-                    if (!line.isEmpty()) {
-                        List<String> data = StringHelper.SplitBySpaceExcludingQuotes(line);
-                        
-                        
-                    }
-                } 
+                
             }
         } catch (IOException e) {
             System.err.println("IO Exeption thrown by shader decompiler. Line failed to read, Corrupt file or invalid file");
@@ -169,6 +280,6 @@ public class GLSLComp {
         return shaderOutput;
     }
 
-    public enum shaderApplyLayer {VERTEX, FRAGMENT, PROPERTYS, NONE}
+    public enum shaderApplyLayer {VERTEX, FRAGMENT, NONE}
     
 }

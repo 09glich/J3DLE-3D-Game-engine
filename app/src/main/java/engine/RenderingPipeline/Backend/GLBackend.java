@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import engine.Behaviors.Camera;
+import engine.Behaviors.Camera.CameraClearMode;
 import engine.GFX.*;
 import engine.GFX.Material.MaterialProperty;
 import engine.GFX.Image.*;
@@ -24,24 +25,49 @@ import  org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.system.MemoryStack;
 
+import static org.lwjgl.opengl.GL11.GL_CLAMP;
 import static org.lwjgl.opengl.GL11.GL_COLOR_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_BUFFER_BIT;
 import static org.lwjgl.opengl.GL11.GL_DEPTH_TEST;
 import static org.lwjgl.opengl.GL11.GL_FLOAT;
 import static org.lwjgl.opengl.GL11.GL_LESS;
+import static org.lwjgl.opengl.GL11.GL_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_LINEAR_MIPMAP_LINEAR;
+import static org.lwjgl.opengl.GL11.GL_NEAREST;
+import static org.lwjgl.opengl.GL11.GL_NEAREST_MIPMAP_NEAREST;
+import static org.lwjgl.opengl.GL11.GL_R;
+import static org.lwjgl.opengl.GL11.GL_REPEAT;
+import static org.lwjgl.opengl.GL11.GL_RGB;
+import static org.lwjgl.opengl.GL11.GL_RGBA;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MAG_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_MIN_FILTER;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_S;
+import static org.lwjgl.opengl.GL11.GL_TEXTURE_WRAP_T;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
+import static org.lwjgl.opengl.GL11.GL_UNPACK_ALIGNMENT;
+import static org.lwjgl.opengl.GL11.GL_UNSIGNED_BYTE;
 import static org.lwjgl.opengl.GL11.GL_UNSIGNED_INT;
+import static org.lwjgl.opengl.GL11.glBindTexture;
 import static org.lwjgl.opengl.GL11.glClear;
 import static org.lwjgl.opengl.GL11.glClearColor;
+import static org.lwjgl.opengl.GL11.glDeleteTextures;
 import static org.lwjgl.opengl.GL11.glDepthFunc;
 import static org.lwjgl.opengl.GL11.glDrawElements;
 import static org.lwjgl.opengl.GL11.glEnable;
+import static org.lwjgl.opengl.GL11.glGenTextures;
+import static org.lwjgl.opengl.GL11.glPixelStorei;
+import static org.lwjgl.opengl.GL11.glTexImage2D;
+import static org.lwjgl.opengl.GL11.glTexParameteri;
 import static org.lwjgl.opengl.GL11.glViewport;
+import static org.lwjgl.opengl.GL13.GL_TEXTURE0;
+import static org.lwjgl.opengl.GL13.glActiveTexture;
 import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_ELEMENT_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glDeleteBuffers;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
@@ -72,7 +98,7 @@ import static org.lwjgl.opengl.GL.createCapabilities;
 import static org.lwjgl.opengl.GL30.*;
 
 public class GLBackend implements BackendGraphics {
-    public enum RenderingPass {Depth(0), Opaque(1), Transparent(2), Shadow(3);
+    public enum RenderingPass {Depth(0),Behind (1), Shadow(2),Opaque(3), Transparent(4);
         private int id = 0;
         RenderingPass(int id) { this.id = id; }
         public int getID() {return id;}
@@ -87,6 +113,7 @@ public class GLBackend implements BackendGraphics {
 
     private List<RenderSubmission> PresistantSubmissions;
     private List<RenderSubmission> PerFrameSubmissions;
+    private List<InstancedRenderSubmission> InstancedSubmissions;
     
     // Convert face Class into 3
     private IntBuffer convertToFaceIntArray(Mesh.Face[] faceArray) {
@@ -192,10 +219,6 @@ public class GLBackend implements BackendGraphics {
     }
 
     //Public Methods
-    // Sets clear color
-    public void setClearColor(Color color) {
-        ClearColor = color;
-    }
 
     // Initializes OpenGL to make it work
     public void init() {
@@ -204,6 +227,10 @@ public class GLBackend implements BackendGraphics {
 
         glEnable(GL_DEPTH_TEST);
         glDepthFunc(GL_LESS);
+
+        System.out.println("GL_VENDOR   : " + org.lwjgl.opengl.GL11.glGetString(org.lwjgl.opengl.GL11.GL_VENDOR));
+        System.out.println("GL_RENDERER : " + org.lwjgl.opengl.GL11.glGetString(org.lwjgl.opengl.GL11.GL_RENDERER));
+        System.out.println("GL_VERSION  : " + org.lwjgl.opengl.GL11.glGetString(org.lwjgl.opengl.GL11.GL_VERSION));
 
         PresistantSubmissions = new ArrayList<> ();
         PerFrameSubmissions = new ArrayList<> ();
@@ -424,7 +451,7 @@ public class GLBackend implements BackendGraphics {
     }
 
     //Draw every frame
-    public void submitPresistant(Matrix4f meshMatrix, Mesh currentMesh, Material CurrentMaterial, Long Layer) 
+    public int submitPresistant(Matrix4f meshMatrix, Mesh currentMesh, Material CurrentMaterial, Long Layer) 
     {
 
         RenderSubmission submission = new RenderSubmission();
@@ -436,23 +463,42 @@ public class GLBackend implements BackendGraphics {
         submission.Build();
 
         PresistantSubmissions.add(submission);
+        return PresistantSubmissions.size();
     }
 
     // Remove from presistant que
-    public void RemovePresisitant() {
+    public void RemovePresisitant(int index) {
 
     }
 
     //Remove all presistant
     public void ClearAllPresistant() {
-
+        PresistantSubmissions.clear();
     }
 
     public void renderCamera(Camera camera) {
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         Vector2 viewSize = camera.getViewSize();
         glViewport(0, 0, (int)viewSize.x, (int)viewSize.y);
-        glClear(GL_COLOR_BUFFER_BIT);
+
+        CameraClearMode ccm = camera.getCameraClearMode();
+        if (ccm == CameraClearMode.BLANK) {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        } else if (ccm == CameraClearMode.COLOR) {
+            Color ClearColor = camera.ClearColor;
+            if (ClearColor == null) ClearColor = this.ClearColor;
+            glClearColor(ClearColor.rf(), ClearColor.gf(), ClearColor.bf(), ClearColor.af());
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+        } else if (ccm == CameraClearMode.SKYBOX) {
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+            
+        } else if (ccm == CameraClearMode.NONE) {
+            // do nothing because you dont need to clear at all
+        }
+
+        
 
         DrawPresistant(camera);
         DrawDynamic(camera);
@@ -491,6 +537,24 @@ class RenderSubmission {
     }
 }
 
+class InstancedRenderSubmission {
+    public Matrix4f[] List;
+    public int renderPass;
+    public int currentMesh;
+    public int material;
+    public int shader;
+
+    public long StaticKey;
+
+    public void Build() {
+        this.StaticKey =  (
+            ((long)this.renderPass << 60) |
+            ((long)this.shader << 48) |
+            ((long)this.material << 32) |
+            ((long)this.currentMesh << 16)
+        );
+    }
+}
 
 class GPUMesh {
     public Mesh MeshAsset;
@@ -691,5 +755,20 @@ class GPUImage {
 class VBOEntry {
     public int Index;
     public int VBO;
+}
+
+class PassSettings {
+    public enum DepthTestMode {Opaque, Transparent, Overwritten}
+    public enum CullMode{BACK, FRONT, OFF}
+
+
+    public int TargetFrameBuffer;
+    public DepthTestMode DepthTest;
+    public CullMode CullMode;
+    public boolean BlendEnabled;
+
+    public PassSettings(int TargetFrameBuffer, DepthTestMode DepthTest, CullMode CullMode, boolean BlendEnabled) {
+        
+    }
 }
 

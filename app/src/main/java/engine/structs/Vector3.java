@@ -3,6 +3,7 @@ package engine.structs;
 import org.joml.Vector3f;
 
 public class Vector3 extends Vector3f {
+    public static final float DEFAULT_EPSILON = 0.0001f;
 
     public Vector3(float x, float y, float z) {
         this.x = x;
@@ -58,6 +59,26 @@ public class Vector3 extends Vector3f {
         this.y /= scalar;
         this.z /= scalar;
         return this;
+    }
+
+    public boolean equals(Vector3 other) {
+        return equals(other, DEFAULT_EPSILON);
+    }
+
+    public boolean equals(Vector3 other, float epsilon) {
+        if (other == null) {
+            return false;
+        }
+        return Math.abs(this.x - other.x) <= epsilon
+            && Math.abs(this.y - other.y) <= epsilon
+            && Math.abs(this.z - other.z) <= epsilon;
+    }
+
+    public boolean equalsExact(Vector3 other) {
+        return other != null
+            && this.x == other.x
+            && this.y == other.y
+            && this.z == other.z;
     }
 
     //defaults

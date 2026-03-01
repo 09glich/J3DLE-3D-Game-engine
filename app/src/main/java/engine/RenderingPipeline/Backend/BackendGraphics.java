@@ -15,9 +15,11 @@ public interface BackendGraphics {
 
     // Draw Functions
     default void drawOnce(Matrix4f meshMatrix, Mesh currentMesh, Material material) {}
-    default void submitPresistant(Matrix4f meshMatrix, Mesh currentMesh, Material material, Long Layer) {}
+    default int submitPresistant(Matrix4f meshMatrix, Mesh currentMesh, Material material, Long Layer) {return 0;}
     default void removePresistant(int indx) {}
     default void ClearAllPresistant() {}
+
+    default void DrawMeshInstanced(Matrix4f[] matrixes, Mesh currentMesh, Material mat) {}
 
     //Asset Loading
     default int PushMesh(Mesh currentMesh) {return -1;}
@@ -32,7 +34,4 @@ public interface BackendGraphics {
     default void init() {}
     default void beginFrame() {}
     default void endFrame() {}
-    
-
-
 }

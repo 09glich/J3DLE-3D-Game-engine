@@ -12,6 +12,7 @@ import engine.RenderingPipeline.Engine_Graphics;
 import engine.RenderingPipeline.RenderFactory;
 import engine.RenderingPipeline.RenderFactory.Backend;
 import engine.debugging.Debug;
+import engine.structs.Vector2;
 
 
 public class App {
@@ -25,10 +26,10 @@ public class App {
         TimeBetweenFrameCall = 1_000_000_000l/Framerate;
 
         CurrentWindow = new Window();
-
-        CurrentWindow.Start();
+        CurrentWindow.Start(new Vector2(1920,1080), windowMode.WINDOWED, VSyncMode.DISABLED);
+        //CurrentWindow.Start();
         //CurrentWindow.setWindowedMode(windowMode.WINDOWED);
-        CurrentWindow.setVsyncMode(VSyncMode.DISABLED); 
+        //CurrentWindow.setVsyncMode(VSyncMode.DISABLED); 
 
         Debug.log("Init Graphics");
         RenderFactory.init(Backend.OPENGL);
@@ -94,6 +95,9 @@ public class App {
     public static void changeFramerate(int framerate) {
         Framerate = framerate;
         TimeBetweenFrameCall = 1_000_000_000l/Framerate;
+    }
+    public static int getFramerate() {
+        return Framerate;
     }
 
 }

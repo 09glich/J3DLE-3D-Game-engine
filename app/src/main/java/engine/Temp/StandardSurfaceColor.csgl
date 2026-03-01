@@ -1,8 +1,8 @@
 #shadername StandardSurface
 #GLversion 330
-#properties
 
-_Color "Current Color" Color = (1, 1, 1)
+
+#P _Color Color 1 1 1 1
 
 
 #pass
